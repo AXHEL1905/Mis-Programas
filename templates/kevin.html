@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fondo de Imagen</title>
+<style>
+    /* Estilos para los botones, puedes ajustar según tus necesidades */
+    .types__StyledButton-sc-ws60qy-0 {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 10px;
+        border-radius: 4px;
+    }
+    .types__StyledButton-sc-ws60qy-0:hover {
+        background-color: #0056b3;
+    }
+    .Box-sc-g0xbh4-0 {
+        display: inline-flex;
+        align-items: center;
+    }
+    svg {
+        margin-right: 5px;
+    }
+    #mapa {
+        height: 400px;
+        margin-top: 20px;
+        display: none; /* Hide the map by default */
+    }
+    #resultado {
+        margin-top: 10px;
+    }
+    body {
+            background-image: url('static/img/Hola.jpg');
+            background-size: cover; 
+            background-position: center ; 
+            background-repeat: no-repeat; 
+            height: 100vh;
+            margin: 0;
+
+        }
+
+
+</style>
+{% endblock %}
+
+{% block body %}
+<!--espacio para el mapa-->
+<html lang="es">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa de Ubicación</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<!-- boton 1 -->
+ <!--<img src="static/img/Hola.jpg" alt="logoRutITA">-->
+<button type="button" class="types__StyledButton-sc-ws60qy-0" id="boton1">
+    <span data-component="buttonContent" class="Box-sc-g0xbh4-0 gUkoLg">
+        <span data-component="text">Generar Ruta</span>
+    </span>
+</button>
+
+<div id="resultado"></div>
+<div id="mapa"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('boton1').addEventListener('click', function() {
+            fetch('/obtener_coordenadas')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al obtener las coordenadas');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.latitud !== null && data.longitud !== null) {
+                        document.getElementById('resultado').innerHTML = `
+                            Latitud: ${data.latitud}, Longitud: ${data.longitud}<br>
+                            Dirección: ${data.direccion}
+                        `;
+                        // Mostrar el mapa en el div
+                        const mapaDiv = document.getElementById('mapa');
+                        mapaDiv.innerHTML = data.mapa; // Cambia el HTML del mapa generado
+                        mapaDiv.style.display = 'block'; // Mostrar el div
+                    } else {
+                        document.getElementById('resultado').innerText = 'No se pudo obtener la ubicación.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('resultado').innerText = 'Error al obtener coordenadas.';
+                });
+        });
+    });
+</script>
+{% endblock %}
